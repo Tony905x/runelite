@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Tyler <https://github.com/tylerthardy>
+ * Copyright (c) 2024, YvesW <https://github.com/YvesW>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -22,35 +22,38 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package net.runelite.client.plugins.timers;
+package net.runelite.client.plugins.timersandbuffs;
 
 import java.awt.Color;
 import lombok.AccessLevel;
 import lombok.Getter;
-import net.runelite.api.SpriteID;
+import net.runelite.client.ui.overlay.infobox.Counter;
 
 @Getter(AccessLevel.PACKAGE)
-enum GameIndicator
+class BuffCounter extends Counter
 {
-	VENGEANCE_ACTIVE(SpriteID.SPELL_VENGEANCE_OTHER, GameTimerImageType.SPRITE, "Vengeance active");
+	private final TimersAndBuffsPlugin plugin;
+	private final GameCounter gameCounter;
 
-	private final String description;
-	private String text;
-	private Color textColor;
-	private final int imageId;
-	private final GameTimerImageType imageType;
-
-	GameIndicator(int imageId, GameTimerImageType idType, String description, String text, Color textColor)
+	BuffCounter(
+		TimersAndBuffsPlugin plugin,
+		GameCounter gameCounter,
+		int count)
 	{
-		this.imageId = imageId;
-		this.imageType = idType;
-		this.description = description;
-		this.text = text;
-		this.textColor = textColor;
+		super(null, plugin, count);
+		this.plugin = plugin;
+		this.gameCounter = gameCounter;
 	}
 
-	GameIndicator(int imageId, GameTimerImageType idType, String description)
+	@Override
+	public String getText()
 	{
-		this(imageId, idType, description, "", null);
+		return gameCounter.isShouldDisplayCount() ? Integer.toString(getCount()) : "";
+	}
+
+	@Override
+	public Color getTextColor()
+	{
+		return gameCounter.getColorBoundaryType().shouldRecolor(getCount(), gameCounter.getBoundary()) ? gameCounter.getColor() : Color.WHITE;
 	}
 }
